@@ -1,0 +1,13 @@
+LeetCode Question 181. Employees Earning More Than Their Managers
+
+Write a solution to find the employees who earn more than their managers.
+Return the result table in any order.
+
+Answer:
+Select e.name as Employee
+from Employee e
+Join Employee m
+on e.managerId = m.Id
+where e.salary > m.salary; 
+
+This is a new concept learnt: Self Join
