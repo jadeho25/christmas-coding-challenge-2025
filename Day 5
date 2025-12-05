@@ -1,0 +1,29 @@
+Leetcode Question 197. Rising Temperature
+Write a solution to find all dates' id with higher temperatures compared to its previous dates (yesterday).
+Return the result table in any order.
+
+Answer:
+SELECT w1.id
+From Weather w1
+LEFT JOIN Weather w2
+ON w2.recordDate = DATE_SUB(w1.recordDate, INTERVAL 1 Day)
+WHERE w2.temperature < w1.temperature
+
+
+Learning notes with ChatGPT:
+"If I join on any condition (not necessarily an id), SQL will pull in the matching row(s) from the other table for every row where the condition evaluates to TRUE."
+✔ It does not matter if the condition uses:
+a column
+an expression
+a function
+a calculation
+or a combination of these
+As long as the condition is TRUE, the row will join.
+If multiple rows match the condition, SQL returns multiple joined rows.
+
+For each row in w1, find all rows in w2 where <condition> is TRUE
+Combine them into one output row
+
+You are not saying that w2.recordDate is an actual ID.
+But… ✔ You are using w2.recordDate as the matching key
+So in this specific join, recordDate plays the role of an ID because each date is unique in this table.
