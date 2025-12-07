@@ -1,0 +1,32 @@
+LeetCode question 577. Employee Bonus
+Write a solution to report the name and bonus amount of each employee who satisfies either of the following:
+The employee has a bonus less than 1000.
+The employee did not get any bonus.
+Return the result table in any order.
+
+Answer:
+SELECT e.name, b.bonus
+FROM Employee e
+LEFT JOIN Bonus b
+ON e.empId = b.empId
+WHERE b.bonus < 1000 OR b.bonus is null
+
+Also learnt new concepts about handling null values:
+-- 1. Coalesce
+It's like "If" condition, but for Null values
+Must be the same data types
+
+Example 1 coalesce(web_address, store_name)
+^this is to select store_name if web_address is Null. 
+
+Example 2coalesce(web_address, store_name, store_id)
+^this is an error because store_id is a numeric data type. All of the expressions should be of the same data type.
+
+-- 2. NVL
+replace null values from an expression with a specified string
+
+Example 1 nvl(comm,0)
+^this is to replace the null values in the field of "comm" with 0
+
+Example 2 nvl(comm, 'no commission')
+^this is an error because the field "comm" only takes numeric data type.
