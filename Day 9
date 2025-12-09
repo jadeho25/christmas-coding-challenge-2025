@@ -1,0 +1,43 @@
+LeetCode question 586. Customer Placing the Largest Number of Orders
+Write a solution to find the customer_number for the customer who has placed the largest number of orders.
+The test cases are generated so that exactly one customer will have placed more orders than any other customer.
+
+Answer:
+SELECT customer_number
+From Orders
+GROUP BY customer_number
+ORDER BY COUNT(*) DESC <-- notes: during GROUP BY, aggregates like COUNT(*) create new “derived” columns in the grouped result.
+Limit 1
+
+
+Notes from ChatGPT:
+
+"GROUP BY" is after WHERE clause
+Yes — in standard SQL the GROUP BY clause always comes after the WHERE clause.
+
+Quick mental model for queries like this
+SELECT   → what you want
+FROM     → table
+WHERE    → filter rows
+GROUP BY → group rows
+HAVING   → filter groups
+ORDER BY → sort
+LIMIT    → take top result(s)
+
+Intuitively, I thought about using MAX(COUNT(order_number)), but SQL doesn't work like this.
+E.g. 
+SELECT customer_number
+FROM Orders
+GROUP BY customer_number
+WHERE COUNT(*) = MAX(COUNT(*));   -- This is illegal SQL
+Because MAX(COUNT(*)) does not exist until after grouping, and SQL doesn't allow aggregation inside aggregation this way.
+
+🆚 Why ORDER BY + LIMIT 1 often feels unintuitive
+Because you start with the thought:
+“I want the maximum value.”
+But SQL doesn’t let you say MAX(COUNT(*)) in the main query cleanly.
+Sorting + picking the first row is a workaround, but a widely accepted one.
+
+It’s basically:
+“If you sort, the max will float to the top.”
+Once you accept that idea, the ORDER BY solution feels extremely natural.
