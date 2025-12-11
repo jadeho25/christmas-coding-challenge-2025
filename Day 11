@@ -1,0 +1,14 @@
+LeetCode question 619. Biggest Single Number
+A single number is a number that appeared only once in the MyNumbers table.
+Find the largest single number. If there is no single number, report null.
+
+Answer:
+SELECT max(num) as num
+FROM (SELECT num
+FROM MyNumbers
+GROUP BY num
+HAVING COUNT(*) = 1) AS single_number
+
+Notes: use "MAX()" to show null values
+initially used the GROUP BY, ORDER BY DESC to show the top value (as learnt from another LeetCode question), but that wouldn't show NULL.
+Also practiced sub-query thought process.
