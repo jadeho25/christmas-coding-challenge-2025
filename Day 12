@@ -1,0 +1,54 @@
+LeetCode question 607. Sales Person
+Write a solution to find the names of all the salespersons who did not have any orders related to the company with the name "RED".
+
+Answer:
+SELECT name
+FROM SalesPerson
+WHERE sales_id NOT IN (
+    SELECT o.sales_id
+    FROM Orders o
+    JOIN Company c
+    ON o.com_id = c.com_id
+    WHERE c.name = 'RED'
+);
+
+
+Notes from ChatGPT:
+*** 
+Mental trick for “NOT IN / NOT EXISTS”
+Whenever a question says:
+“Find all X who do NOT have Y”
+
+Think:
+First, find everyone who has Y.
+Then, pick everyone NOT in that list.
+This immediately leads to NOT IN or NOT EXISTS.
+***
+
+Previous incorrect attempt: 
+SELECT s.name
+FROM SalesPerson s
+LEFT JOIN Orders o
+ON s.sales_id = o.sales_id
+LEFT JOIN Company c
+ON o.com_id = c.com_id
+GROUP BY s.name, s.sales_id
+HAVING SUM(c.name = 'RED') = 0;
+
+^looks like MySQL doesn't accept SUN(c.name = 'RED').
+other notes for another attempt: You selected s.name but did NOT group by s.name.
+Even if sales_id is unique, SQL rules still require every non-aggregated column in the SELECT list to appear in GROUP BY.
+
+HAVING can only use:
+- columns that are in GROUP BY, OR
+- aggregate functions (like SUM / COUNT)
+
+***
+Why people overcomplicate it
+Many people immediately think:
+“I need to exclude RED orders, so maybe GROUP BY + HAVING SUM…”
+“Or use LEFT JOIN and filter IS NULL”
+
+This works too, but it’s more complex and easier to get logical errors (like your earlier attempts).
+Using NOT IN or NOT EXISTS is more direct:
+“Get all salespeople who are not in the list of RED sellers.”
