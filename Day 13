@@ -1,0 +1,50 @@
+LeetCode question 610. Triangle Judgement
+In SQL, (x, y, z) is the primary key column for this table.
+Each row of this table contains the lengths of three line segments.
+Report for every three line segments whether they can form a triangle.
+
+Answer:
+SELECT 
+x, 
+y, 
+z,
+CASE
+    WHEN x + y > z
+    AND x + z > y
+    AND y + z > x
+    THEN 'Yes'
+    ELSE 'No'
+END AS triangle
+FROM Triangle;
+
+
+Learning note from ChatGPT:
+The concept of 'CASE'
+Think of CASE like if / else in programming.
+
+Syntax:
+CASE
+    WHEN condition THEN value_if_true
+    ELSE value_if_false
+END
+
+Example:
+SELECT
+    x,
+    CASE
+        WHEN x > 10 THEN 'Big'
+        ELSE 'Small'
+    END AS size
+FROM Triangle;
+
+^ this is row-by-row logic; 
+For each row:
+If x > 10 → output "Big"
+Otherwise → output "Small"
+
+^ this is also related to the concept of '(x, y, z) is the primary key column for this table'.
+
+
+My initial question: "How do I create an output column with a boolean value and column name 'triangle' when that's not a column in the table."
+^ the concept of 'CASE' answers this.
+
