@@ -1,0 +1,47 @@
+LeetCode question 620. Not Boring Movies
+Write a solution to report the movies with an odd-numbered ID and a description that is not "boring".
+Return the result table ordered by rating in descending order.
+
+Answer:
+SELECT *
+FROM Cinema
+WHERE id % 2 = 1 AND description != 'boring'
+ORDER BY rating DESC
+
+Notes / Learning using ChatGPT:
+Use of the modulo operator (%)
+
+My initial thought: find movies with the description of "boring", then exlude them. But no, this will overcomplicate the query.
+You correctly recognized a logical negation — SQL just lets you express it more directly here. 
+Because you already have the row in hand. 
+You’re filtering the same table, row by row.
+It is simpler than:
+- building a subquery
+- collecting IDs
+- excluding them later
+
+Think of it like this:
+“If I already know the color of the apple I’m holding,
+why put all red apples in a basket just to avoid them?”
+
+***
+Use the simplest expression that directly describes the row condition.
+Row-level condition → WHERE column != value
+Set-level condition → NOT IN / NOT EXISTS
+
+Row-level = “Can I decide this by looking at ONE row?”
+Set-level = “Do I need to look at OTHER rows to decide?”
+
+Set-level:
+- You must scan a group of rows
+- You’re comparing against a collection, not a value
+
+Other questions:
+❓ “Do I need CASE / WHEN?”
+👉 No.
+CASE WHEN is mainly used for conditional output, not filtering rows.
+WHERE is the correct tool here.
+
+❓ “Is CASE WHEN only usable in SELECT?”
+👉 Mostly yes, though it can also appear in ORDER BY.
+But for conditions like this, WHERE is simpler and clearer.
