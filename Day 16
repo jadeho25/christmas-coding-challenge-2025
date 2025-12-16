@@ -1,0 +1,69 @@
+LeetCode question 1075. Project Employees I
+Write an SQL query that reports the average experience years of all the employees for each project, rounded to 2 digits.
+
+Answer:
+SELECT project_id, ROUND(AVG(experience_years),2) AS average_years
+FROM Project p
+JOIN Employee e
+ON p.employee_id = e.employee_id
+GROUP BY project_id
+
+LeetCode question 1084. Sales Analysis III
+Write a solution to report the products that were only sold in the first quarter of 2019. That is, between 2019-01-01 and 2019-03-31 inclusive.
+
+Answer:
+SELECT p.product_id, p.product_name
+FROM Product p
+JOIN Sales s
+ON p.product_id = s.product_id
+WHERE NOT EXISTS(
+    SELECT 1
+    FROM Sales a
+    WHERE a.product_id = p.product_id
+    AND (sale_date > '2019-03-31'
+    OR sale_date < '2019-01-01')
+)
+AND sale_date BETWEEN '2019-01-01' AND '2019-03-31'
+GROUP BY p.product_id, p.product_name
+
+***
+Notes of using WHERE NOT EXIST & a subquery:
+
+FOR each row in outer query (product_id = X):
+    run subquery WHERE product_id = X
+
+Without the correlation:
+FOR each row:
+    run subquery on ENTIRE table
+
+So, the correlation 'WHERE a.product_id = p.product_id' is needed so that it's looking at each product_id.
+
+Other notes:
+NOT IN is dangerous if NULLs exist
+If product_id could ever be NULL → query breaks logically
+
+"SELECT DISTINCT p.product_id, p.product_name" is recommended, instead of GROUP BY
+ChatGPT: Because you are not aggregating anything.
+
+Your query logic is:
+check whether a product qualifies or not
+return the product once
+You are not calculating:
+SUM
+COUNT
+MAX
+etc.
+So GROUP BY is not being used for its real purpose.
+
+Clean version by ChatGPT:
+SELECT p.product_id, p.product_name
+FROM Product p
+JOIN Sales s ON p.product_id = s.product_id
+GROUP BY p.product_id, p.product_name
+HAVING MIN(s.sale_date) >= '2019-01-01'
+   AND MAX(s.sale_date) <= '2019-03-31';
+
+Trick: ask yourself “earliest and latest sale”
+If the earliest sale is ≥ Jan 1 → nothing before Q1
+If the latest sale is ≤ Mar 31 → nothing after Q1
+*** Whenever a question is “only in this period” or “never outside that period,” think MIN/MAX of dates. *** 
