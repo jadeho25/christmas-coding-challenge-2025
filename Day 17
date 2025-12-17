@@ -1,0 +1,44 @@
+LeetCode question 1141. User Activity for the Past 30 Days I
+Write a solution to find the daily active user count for a period of 30 days ending 2019-07-27 inclusively. A user was active on someday if they made at least one activity on that day.
+
+Answer:
+SELECT activity_date AS day, COUNT(DISTINCT user_id) AS active_users
+FROM Activity
+WHERE activity_date BETWEEN DATE_SUB('2019-07-27', INTERVAL 29 DAY) AND '2019-07-27'
+GROUP BY activity_date
+
+Notes from ChatGPT:
+- data type: ENUM
+An ENUM is a data type that restricts a column to a fixed set of predefined values.
+
+- Syntax of DATE_SUB for mySQL
+subtracts time from a date or datetime
+DATE_SUB(date_value, INTERVAL n unit)
+
+adds time to a date or datetime
+DATE_ADD(date_value, INTERVAL n unit)
+
+- Databricks SQL is based on Spark SQL, not MySQL.
+Subtract days
+date_sub(date, days)
+date_sub('2019-07-27', 29)
+
+Add days
+date_add(date, days)
+date_add('2019-07-27', 1)
+
+***
+There are really only 3 ideas you need:
+
+A. Date arithmetic exists
+You can add or subtract time from a date.
+
+B. Inclusive date windows
+“30 days ending on X” means
+start = X − 29 days, end = X
+
+C. Prefer half-open ranges for timestamps
+>= start and < end + 1 day
+
+Everything else is just dialect spelling.
+***
