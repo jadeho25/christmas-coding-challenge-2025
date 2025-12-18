@@ -1,0 +1,84 @@
+LeetCode question 1148. Article Views I
+Write a solution to find all the authors that viewed at least one of their own articles.
+Return the result table sorted by id in ascending order.
+
+Answer:
+SELECT DISTINCT author_id AS id
+FROM Views
+WHERE viewer_id = author_id
+ORDER BY author_id ASC;
+
+LeetCode question 1211. Queries Quality and Percentage
+Write a solution to find each query_name, the quality and poor_query_percentage.
+Both quality and poor_query_percentage should be rounded to 2 decimal places.
+
+Answer:
+SELECT query_name, 
+ROUND(AVG(rating * 1.0 /position), 2) AS quality, 
+ROUND(SUM(CASE WHEN rating < 3 THEN 1 ELSE 0 END) * 1.0 / COUNT(*) * 100, 2) AS poor_query_percentage
+FROM Queries
+GROUP BY query_name
+
+Even cleaner:
+SELECT query_name, 
+ROUND(AVG(rating * 1.0 /position), 2) AS quality, 
+ROUND(AVG(CASE WHEN rating < 3 THEN 100.0 ELSE 0 END), 2) AS poor_query_percentage <-- using AVG here, and the THEN 100.0 already in percentage form and decimal
+FROM Queries
+GROUP BY query_name
+
+***
+
+My previous attempt:
+SELECT query_name, 
+ROUND(AVG(rating/position), 2) AS quality,  <-- interger division
+(SELECT COUNT(*) FROM Queries WHERE rating < 3) / COUNT(*) AS poor_query_percentage, <-- global query in the sub-query, and no percentage conversion 
+FROM Queries
+GROUP BY query_name
+
+***
+
+Ideas of using CASE WHEN in GROUP BY to look at each row in a group.
+CASE WHEN (filtering condition) THEN (output when TRUE) ELSE (output when FALSE) END
+e.g. Row-by-row filtering is preserved because CASE is evaluated for each row before AVG aggregates
+
+In this case, the 1 is just a counting placeholder.
+When we SUM over these marks, the total sum equals the number of rows that satisfy the condition.
+Note: It doesn’t have to be 1. You could put any number and it would sum that value instead — but 1 is conventional when counting things.
+
+***
+
+👉 Both columns are INT
+So SQL performs integer division.
+Integer division rules
+5 / 2 = 2
+1 / 200 = 0
+Decimal part is discarded, not rounded.
+To fix this, at least one side must be a decimal, so that SQL switches to floating-point division.
+Any of these work:
+rating * 1.0 / position
+rating / CAST(position AS DOUBLE)
+CAST(rating AS DOUBLE) / position
+
+***
+Mental rule to remember:
+
+If both operands are INT, division is INT.
+SQL will not warn you.
+
+***
+
+Key mental model
+
+GROUP BY scopes aggregates, not subqueries.
+
+Only two things are affected by GROUP BY:
+Columns in the SELECT
+Aggregate functions that use the grouped rows
+
+A subquery:
+Has its own scope
+Ignores outer grouping unless explicitly correlated
+
+If a subquery does not reference a column from the outer query, it runs once for the whole table — GROUP BY does not apply to it.
+
+***
