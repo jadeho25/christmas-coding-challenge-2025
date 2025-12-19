@@ -1,0 +1,81 @@
+LeetCode question 1251. Average Selling Price
+Write a solution to find the average selling price for each product. average_price should be rounded to 2 decimal places. If a product does not have any sold units, its average selling price is assumed to be 0.
+Return the result table in any order.
+
+
+Answer:
+SELECT p.product_id,
+ROUND(COALESCE (SUM(p.price * u.units) * 1.0 / SUM(u.units), 0.0),2) AS average_price
+FROM Prices p
+LEFT JOIN UnitsSold u
+ON p.product_id = u.product_id
+AND u.purchase_date BETWEEN p.start_date AND p.end_date
+GROUP BY p.product_id
+
+^ instead of SUM(u.units), ChatGPT suggested: 
+NULLIF(SUM(u.units,0) <-- defensive SQL in case 0 is a denominator, though it's not possible in this context.
+
+
+NULLIF(a, b) means:
+Return NULL if a = b, otherwise return a.
+
+🔑 mental model
+Use NULLIF only if zero is a possible denominator
+Use COALESCE when NULL is possible
+
+---
+ChatGPT feedback on my other attempts:
+
+You tried to “fix” bad matches AFTER joining everything
+Your mental model was:
+“Join everything by product_id, then use CASE to ignore invalid rows.”
+
+This is procedural thinking: Join first, Clean later
+SQL doesn’t want cleanup logic inside aggregates unless absolutely necessary.
+
+🔑 The core insight you were missing 💡 
+Invalid matches should never exist — not be ignored later.
+That’s the declarative shift.
+
+Instead of: joining too much, then zeroing things out
+You should: only allow valid matches to exist in the join.
+
+🔑 Mental model
+If you feel the need to use CASE to “undo” a JOIN,
+the JOIN is missing a condition.
+
+----
+This is the exact concept that unlocks SQL:
+Declarative means:
+You describe what you want,
+not how to do it step by step.
+🔑 You state the rules and relationships, and the system figures out the steps.
+
+✅ Procedural (how humans usually think)
+Example: “Make a sandwich”
+1. Take bread
+2. Add peanut butter
+3. Add jelly
+4. Close sandwich
+
+You control every step.
+Languages like: Python, Java, C++, JavaScript work this way.
+
+✅ Declarative (how SQL thinks)
+Example: “Make a sandwich”
+A sandwich is:
+- two slices of bread
+- with peanut butter
+- and jelly in between
+
+You don’t say how to assemble it.
+You describe what qualifies as a sandwich.
+SQL, HTML, CSS work this way.
+
+🔑 Key mental shift 
+
+❌ Procedural mindset:
+“What should happen first?”
+
+✅ Declarative mindset:
+“What must be true for a row to be included?”
